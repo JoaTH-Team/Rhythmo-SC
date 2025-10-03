@@ -10,6 +10,7 @@
 * [ ] Add documentation inside files
 * [ ] Redo Chart Editor Again
 * [ ] Optimizations
+* [X] Simple `setProperty` and `getProperty` function
 
 ### Low Priority
 * [ ] Improve + Fix Notes

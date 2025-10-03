@@ -281,8 +281,8 @@ function update(elapsed:Float)
 * `insertObject(tag:String, pos:Int = 0)` - Inserts an object at a specific position.
 * `setPosition(tag:String, x:Float, y:Float)` - Sets an object's position.
 * `setScale(tag:String, x:Float, y:Float)` - Sets the scaling of an object.
-* `setProperty(tag:String, property:String, value:Dynamic)` - Sets the property of an object.
-* `getProperty(tag:String, property:String)` - Gets the property of an object.
+* `setProperty(propertyGame:String, value:Dynamic)` - Sets the property of an object.
+* `getProperty(propertyGame:String)` - Gets the property of an object.
 
 ### Text
 * `createObject("text", "tag", {x = 0, y = 0, width = 0, text = "Text goes here.", size = 16})` - Creates a text object.

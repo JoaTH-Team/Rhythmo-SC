@@ -147,29 +147,77 @@ class LuaScript extends FlxBasic
 				setCodeWithCheckNull(config.scrollFactor, sf -> o.scrollFactor.set(sf.x, sf.y));
 			}
 		});
-		setCallback('setProperty', function(tag:String, property:String, value:Dynamic)
+		setCallback('setProperty', function(propertyGame:String, value:Dynamic)
 		{
+			var pathParts = propertyGame.split(".");
+			
+			if (pathParts.length == 1)
+			{
+				if (game != null)
+					Reflect.setProperty(game, propertyGame, value);
+				return;
+			}
+			
+			var tag = pathParts[0];
+			var propertyPath = pathParts.slice(1).join(".");
+			
 			if (PlayState.luaImages.exists(tag))
-				Reflect.setProperty(PlayState.luaImages.get(tag), property, value);
-			if (PlayState.luaText.exists(tag))
-				Reflect.setProperty(PlayState.luaText.get(tag), property, value);
-			if (PlayState.luaObjects.exists(tag))
-				Reflect.setProperty(PlayState.luaObjects.get(tag), property, value);
-			if (game != null)
-				Reflect.setProperty(game, property, value);
+			{
+				var target = PlayState.luaImages.get(tag);
+				setNestedProperty(target, propertyPath, value);
+			}
+			else if (PlayState.luaText.exists(tag))
+			{
+				var target = PlayState.luaText.get(tag);
+				setNestedProperty(target, propertyPath, value);
+			}
+			else if (PlayState.luaObjects.exists(tag))
+			{
+				var target = PlayState.luaObjects.get(tag);
+				setNestedProperty(target, propertyPath, value);
+			}
+			else if (game != null)
+			{
+				setNestedProperty(game, propertyGame, value);
+			}
 		});
-		setCallback('getProperty', function(tag:String, property:String)
+
+		setCallback('getProperty', function(propertyGame:String)
 		{
+			var pathParts = propertyGame.split(".");
+			
+			if (pathParts.length == 1)
+			{
+				if (game != null)
+					return Reflect.getProperty(game, propertyGame);
+				return null;
+			}
+			
+			var tag = pathParts[0];
+			var propertyPath = pathParts.slice(1).join(".");
+			
 			if (PlayState.luaImages.exists(tag))
-				return Reflect.getProperty(PlayState.luaImages.get(tag), property);
-			if (PlayState.luaText.exists(tag))
-				return Reflect.getProperty(PlayState.luaText.get(tag), property);
-			if (PlayState.luaObjects.exists(tag))
-				return Reflect.getProperty(PlayState.luaObjects.get(tag), property);
-			if (game != null)
-				return Reflect.getProperty(game, property);
+			{
+				var target = PlayState.luaImages.get(tag);
+				return getNestedProperty(target, propertyPath);
+			}
+			else if (PlayState.luaText.exists(tag))
+			{
+				var target = PlayState.luaText.get(tag);
+				return getNestedProperty(target, propertyPath);
+			}
+			else if (PlayState.luaObjects.exists(tag))
+			{
+				var target = PlayState.luaObjects.get(tag);
+				return getNestedProperty(target, propertyPath);
+			}
+			else if (game != null)
+			{
+				return getNestedProperty(game, propertyGame);
+			}
 			return null;
 		});
+
 		setCallback('setPosition', function(tag:String, x:Float, y:Float)
 		{
 			if (PlayState.luaImages.exists(tag))
@@ -340,6 +388,35 @@ class LuaScript extends FlxBasic
 
 		if (execute)
 			callFunction('create', []);
+	}
+
+	function setNestedProperty(target:Dynamic, path:String, value:Dynamic):Void
+	{
+		var parts = path.split(".");
+		var current = target;
+		
+		for (i in 0...parts.length - 1)
+		{
+			if (current == null) return;
+			current = Reflect.getProperty(current, parts[i]);
+		}
+		
+		if (current != null)
+			Reflect.setProperty(current, parts[parts.length - 1], value);
+	}
+
+	function getNestedProperty(target:Dynamic, path:String):Dynamic
+	{
+		var parts = path.split(".");
+		var current = target;
+		
+		for (part in parts)
+		{
+			if (current == null) return null;
+			current = Reflect.getProperty(current, part);
+		}
+		
+		return current;
 	}
 
 	public function callFunction(name:String, args:Array<Dynamic>):Dynamic

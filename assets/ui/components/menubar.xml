@@ -7,10 +7,10 @@
         <menu text="File">
             <menu-item text="Load Song" />
             <menu-item text="Load JSON" />
-            <menu-item text="Save" />
-            <menu-item text="Save As..." />
+            <menu-item text="Save" shortcutText="Ctrl+S" />
+            <menu-item text="Save As..." shortcutText="Ctrl+Shift+S" />
             <menu-separator />
-            <menu-item text="Exit" />
+            <menu-item text="Exit" shortcutText="Esc" />
         </menu>
 
         <menu text="Edit">
@@ -21,7 +21,7 @@
         </menu>
 
         <menu text="Chart">
-            <menu-item text="Playtest" />
+            <menu-item text="Playtest" shortcutText="Enter" />
             <menu-item text="Edit Metadata" />
         </menu>
 

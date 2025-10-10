@@ -8,6 +8,7 @@ import sys.io.Process;
 #end
 import rhythmo.debug.FPS;
 import haxe.ui.Toolkit;
+import flixel.util.typeLimit.NextState;
 
 /**
  * The main entry point for the game.
@@ -18,16 +19,34 @@ import hxgamemode.GamemodeClient;
 class Main extends openfl.display.Sprite
 {
 	/**
-	 * Configuration for the game.
-	 * This includes the game dimensions, framerate, initial state, and options for splash screen and fullscreen.
+	 * The width of the game window in pixels.
 	 */
-	public final config:Dynamic = {
-		gameDimensions: [1280, 720],
-		initialState: InitialState,
-		framerate: 60,
-		skipSplash: true,
-		startFullscreen: false
-	};
+	private static final GAME_WIDTH:Int = 1280;
+
+	/**
+	 * The height of the game window in pixels.
+	 */
+	private static final GAME_HEIGHT:Int = 720;
+
+	/**
+	 * The frame rate of the game, in frames per second (FPS).
+	 */
+	private static final GAME_FRAMERATE:Int = 60;
+
+	/**
+	 * The initial state of the game.
+	 */
+	private static final GAME_INITIAL_STATE:InitialState = () -> new jta.states.Startup();
+
+	/**
+	 * Whether to skip the splash screen on startup.
+	 */
+	private static final GAME_SKIP_SPLASH:Bool = true;
+
+	/**
+	 * Whether to start the game in fullscreen mode on desktop.
+	 */
+	private static final GAME_START_FULLSCREEN:Bool = false;
 
 	/**
 	 * The frame rate display.
@@ -103,9 +122,8 @@ class Main extends openfl.display.Sprite
 		WindowsAPI.darkMode(true);
 		#end
 
-		framerate = 60; // default framerate
-		addChild(new FlxGame(config.gameDimensions[0], config.gameDimensions[1], config.initialState, config.framerate, config.framerate, config.skipSplash,
-			config.startFullscreen));
+		framerate = GAME_FRAMERATE; // default framerate
+		addChild(new FlxGame(GAME_WIDTH, GAME_HEIGHT, GAME_INITIAL_STATE, GAME_FRAMERATE, GAME_FRAMERATE, GAME_SKIP_SPLASH, GAME_START_FULLSCREEN));
 
 		fpsDisplay = new FPS(10, 10, 0xffffff);
 		addChild(fpsDisplay);

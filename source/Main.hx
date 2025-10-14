@@ -36,7 +36,7 @@ class Main extends openfl.display.Sprite
 	/**
 	 * The initial state of the game.
 	 */
-	private static final GAME_INITIAL_STATE:InitialState = () -> new jta.states.Startup();
+	private static final GAME_INITIAL_STATE:InitialState = () -> new rhythmo.states.InitialState();
 
 	/**
 	 * Whether to skip the splash screen on startup.

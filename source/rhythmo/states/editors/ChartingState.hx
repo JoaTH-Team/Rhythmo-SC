@@ -12,7 +12,6 @@ import flixel.addons.ui.FlxUIInputText;
 import flixel.input.mouse.FlxMouseEvent;
 import haxe.ui.backend.flixel.UIState;
 import haxe.ui.core.Component;
-import haxe.ui.util.ScreenUtil;
 import haxe.ui.events.ComponentEvent;
 import haxe.ui.components.Menu;
 import haxe.ui.components.MenuItem;

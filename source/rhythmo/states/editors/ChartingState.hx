@@ -9,16 +9,11 @@ import openfl.net.FileReference;
 import openfl.net.FileFilter;
 import flixel.addons.ui.FlxInputText;
 import flixel.addons.ui.FlxUIInputText;
-import flixel.input.mouse.FlxMouseEvent;
 import haxe.ui.backend.flixel.UIState;
 import haxe.ui.core.Component;
-import haxe.ui.events.ComponentEvent;
-import haxe.ui.components.Menu;
-import haxe.ui.components.MenuItem;
-import haxe.ui.components.Menubar;
 import haxe.ui.components.TextField;
 import haxe.ui.components.Button;
-import haxe.ui.components.Dialog;
+import haxe.ui.containers.VBox;
 
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/main-view.xml"))
 class ChartingState extends haxe.ui.backend.flixel.UIState
@@ -89,14 +84,14 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 		DiscordClient.changePresence('Chart Editor', null, null, true);
 		#end
 
-        menubar = cast this.findComponent("menubar");
+        menubar = findComponent("menubar");
 
-        metadataDialog = cast this.findComponent("toolboxMetadata");
-        inputSongName = cast this.findComponent("inputSongName");
-        inputSongBPM = cast this.findComponent("inputSongBPM");
-        inputSongSig = cast this.findComponent("inputSongSig");
-        btnSaveMetadata = cast this.findComponent("btnSaveMetadata");
-        btnCancelMetadata = cast this.findComponent("btnCancelMetadata");
+        metadataDialog = findComponent("toolboxMetadata");
+        inputSongName = findComponent("inputSongName");
+        inputSongBPM = findComponent("inputSongBPM");
+        inputSongSig = findComponent("inputSongSig");
+        btnSaveMetadata = findComponent("btnSaveMetadata");
+        btnCancelMetadata = findComponent("btnCancelMetadata");
 
         addMenuHandler("miLoadSong", function(_) { openSubState(new LoadSongSubState()); });
         addMenuHandler("miLoadJSON", function(_) { loadSongFromFile(); });
@@ -115,9 +110,9 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
         addMenuHandler("miControls", function(_) { openSubState(new HelpSubState()); });
 
         if (btnSaveMetadata != null)
-            btnSaveMetadata.addEventListener(ComponentEvent.ACTION, function(_) { saveMetadata(); });
+            btnSaveMetadata.onClick = function(_) saveMetadata();
         if (btnCancelMetadata != null)
-            btnCancelMetadata.addEventListener(ComponentEvent.ACTION, function(_) { closeMetadataDialog(); });
+            btnCancelMetadata.onClick = function(_) closeMetadataDialog();
 
 		var mouseSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image('cursor/cursor'));
 		FlxG.mouse.load(mouseSpr.pixels);

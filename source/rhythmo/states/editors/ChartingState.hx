@@ -14,6 +14,7 @@ import haxe.ui.core.Component;
 import haxe.ui.components.TextField;
 import haxe.ui.components.Button;
 import haxe.ui.containers.VBox;
+import haxe.ui.containers.dialogs.Dialog;
 
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/main-view.xml"))
 class ChartingState extends haxe.ui.backend.flixel.UIState

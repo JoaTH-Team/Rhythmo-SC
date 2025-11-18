@@ -42,7 +42,6 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 
 	var strumLine:FlxSprite;
 
-	var menubar:Menubar;
     var metadataDialog:Dialog;
     var inputSongName:TextField;
     var inputSongBPM:TextField;
@@ -83,8 +82,6 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 		#if FUTURE_DISCORD_RPC
 		DiscordClient.changePresence('Chart Editor', null, null, true);
 		#end
-
-        menubar = findComponent("menubar");
 
         metadataDialog = findComponent("toolboxMetadata");
         inputSongName = findComponent("inputSongName");

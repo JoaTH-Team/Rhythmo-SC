@@ -15,6 +15,7 @@ import haxe.ui.components.TextField;
 import haxe.ui.components.Button;
 import haxe.ui.containers.VBox;
 import haxe.ui.containers.dialogs.Dialog;
+import haxe.ui.events.MouseEvent;
 
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/main-view.xml"))
 class ChartingState extends haxe.ui.backend.flixel.UIState
@@ -42,13 +43,6 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 	var notesCopied:Array<Dynamic> = [];
 
 	var strumLine:FlxSprite;
-
-    var metadataDialog:Dialog;
-    var inputSongName:TextField;
-    var inputSongBPM:TextField;
-    var inputSongSig:TextField;
-    var btnSaveMetadata:Button;
-    var btnCancelMetadata:Button;
 
 	var _file:FileReference;
 
@@ -84,28 +78,21 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 		DiscordClient.changePresence('Chart Editor', null, null, true);
 		#end
 
-        metadataDialog = findComponent("toolboxMetadata");
-        inputSongName = findComponent("inputSongName");
-        inputSongBPM = findComponent("inputSongBPM");
-        inputSongSig = findComponent("inputSongSig");
-        btnSaveMetadata = findComponent("btnSaveMetadata");
-        btnCancelMetadata = findComponent("btnCancelMetadata");
+miLoadSong.onClick = function(e:MouseEvent) { openSubState(new LoadSongSubState()); };
+miLoadJSON.onClick = function(e:MouseEvent) { loadSongFromFile(); };
+miSave.onClick = function(e:MouseEvent) { saveSong(); };
+miSaveAs.onClick = function(e:MouseEvent) { saveSong(); }; // reuse saveSong for now
+miExit.onClick = function(e:MouseEvent) { FlxG.resetState(); };
 
-        addMenuHandler("miLoadSong", function(_) { openSubState(new LoadSongSubState()); });
-        addMenuHandler("miLoadJSON", function(_) { loadSongFromFile(); });
-        addMenuHandler("miSave", function(_) { saveSong(); });
-        addMenuHandler("miSaveAs", function(_) { saveSong(); }); // reuse saveSong for now
-        addMenuHandler("miExit", function(_) { FlxG.resetState(); });
+miCopySection.onClick = function(e:MouseEvent) { copySection(); };
+miPasteSection.onClick = function(e:MouseEvent) { pasteSection(); };
+miClearSection.onClick = function(e:MouseEvent) { clearSection(); };
+miClearSong.onClick = function(e:MouseEvent) { clearSong(); };
 
-        addMenuHandler("miCopySection", function(_) { copySection(); });
-        addMenuHandler("miPasteSection", function(_) { pasteSection(); });
-        addMenuHandler("miClearSection", function(_) { clearSection(); });
-        addMenuHandler("miClearSong", function(_) { clearSong(); });
+miPlaytest.onClick = function(e:MouseEvent) { openPlayState(); };
+miEditMetadata.onClick = function(e:MouseEvent) { openMetadataDialog(); };
 
-        addMenuHandler("miPlaytest", function(_) { openPlayState(); });
-        addMenuHandler("miEditMetadata", function(_) { openMetadataDialog(); });
-
-        addMenuHandler("miControls", function(_) { openSubState(new HelpSubState()); });
+miControls.onClick = function(e:MouseEvent) { openSubState(new HelpSubState()); };
 
         if (btnSaveMetadata != null)
             btnSaveMetadata.onClick = function(_) saveMetadata();
@@ -155,15 +142,6 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 		charterVer.scrollFactor.set();
 		add(charterVer);
 	}
-
-	function addMenuHandler(id:String, f:ComponentEvent->Void):Void
-    {
-        var comp:Component = this.findComponent(id);
-        if (comp != null)
-        {
-            comp.addEventListener(ComponentEvent.ACTION, f);
-        }
-    }
 
 	function openMetadataDialog():Void
     {

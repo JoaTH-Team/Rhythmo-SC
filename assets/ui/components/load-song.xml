@@ -1,0 +1,8 @@
+<vbox width="400" height="200" style="padding:20px;" id="loadSongDialog">
+    <label text="Enter a song to load:" style="font-size:18px;" />
+    <textfield id="txtSongName" text="" style="margin-top:10px;" />
+    <hbox style="margin-top:20px;" horizontalAlign="center">
+        <button id="btnLoad" text="Load" />
+        <button id="btnCancel" text="Cancel" style="margin-left:20px;" />
+    </hbox>
+</vbox>

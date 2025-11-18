@@ -10,12 +10,16 @@ import openfl.net.FileFilter;
 import flixel.addons.ui.FlxInputText;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.input.mouse.FlxMouseEvent;
-
-typedef DropdownMenuItem =
-{
-	var name:String;
-	var func:Void->Void;
-}
+import haxe.ui.backend.flixel.UIState;
+import haxe.ui.core.Component;
+import haxe.ui.util.ScreenUtil;
+import haxe.ui.events.ComponentEvent;
+import haxe.ui.components.Menu;
+import haxe.ui.components.MenuItem;
+import haxe.ui.components.Menubar;
+import haxe.ui.components.TextField;
+import haxe.ui.components.Button;
+import haxe.ui.components.Dialog;
 
 @:build(haxe.ui.ComponentBuilder.build("assets/ui/main-view.xml"))
 class ChartingState extends haxe.ui.backend.flixel.UIState
@@ -44,10 +48,13 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 
 	var strumLine:FlxSprite;
 
-	var topNavBar:Array<FlxText> = [];
-	var dropDowns:Map<String, Array<FlxText>> = [];
-	var menuStructure:Map<String, Array<DropdownMenuItem>> = [];
-	var activeDropdown:String = '';
+	var menubar:Menubar;
+    var metadataDialog:Dialog;
+    var inputSongName:TextField;
+    var inputSongBPM:TextField;
+    var inputSongSig:TextField;
+    var btnSaveMetadata:Button;
+    var btnCancelMetadata:Button;
 
 	var _file:FileReference;
 
@@ -72,6 +79,8 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 
 	override public function create():Void
 	{
+		super.create();
+
 		Main.fpsDisplay.visible = false;
 
 		Paths.clearStoredMemory();
@@ -81,102 +90,35 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 		DiscordClient.changePresence('Chart Editor', null, null, true);
 		#end
 
-		/*menuStructure = [
-			'Help' => [{name: 'Controls', func: () -> openSubState(new HelpSubState())}],
-			'Chart' => [
-				{name: 'Playtest', func: openPlayState},
-				{name: 'Edit Metadata', func: () -> openSubState(new SongDataSubState())}
-			],
-			'Edit' => [
-				{
-					name: 'Copy Section',
-					func: () ->
-					{
-						notesCopied = [];
-						sectionToCopy = curSection;
-						for (i in 0...song.notes[curSection].sectionNotes.length)
-							notesCopied.push(song.notes[curSection].sectionNotes[i]);
-					}
-				},
-				{
-					name: 'Paste Section',
-					func: () ->
-					{
-						if (notesCopied == null || notesCopied.length < 1)
-							return;
+        menubar = cast this.findComponent("menubar");
 
-						for (note in notesCopied)
-						{
-							var clonedNote = {
-								noteStrum: note.noteStrum + Conductor.stepCrochet * (4 * 4 * (curSection - sectionToCopy)),
-								noteData: note.noteData,
-								noteSus: note.noteSus
-							};
-							song.notes[curSection].sectionNotes.push(clonedNote);
-						}
+        metadataDialog = cast this.findComponent("toolboxMetadata");
+        inputSongName = cast this.findComponent("inputSongName");
+        inputSongBPM = cast this.findComponent("inputSongBPM");
+        inputSongSig = cast this.findComponent("inputSongSig");
+        btnSaveMetadata = cast this.findComponent("btnSaveMetadata");
+        btnCancelMetadata = cast this.findComponent("btnCancelMetadata");
 
-						updateGrid();
-					}
-				},
-				{
-					name: 'Clear Section',
-					func: () ->
-					{
-						song.notes[curSection].sectionNotes = [];
-						updateGrid();
-					}
-				},
-				{
-					name: 'Clear Song',
-					func: () ->
-					{
-						openSubState(new PromptSubState(Localization.get('youDecide'), () ->
-						{
-							for (daSection in 0...song.notes.length)
-								song.notes[daSection].sectionNotes = [];
-							updateGrid();
-						}));
-					}
-				}
-			],
-			'File' => [
-				{name: 'Load Song', func: () -> openSubState(new LoadSongSubState())},
-				{name: 'Load JSON', func: loadSongFromFile},
-				{
-					name: 'Save Chart',
-					func: () ->
-					{
-						try
-						{
-							var chart:String = Json.stringify(song);
-							File.saveContent(Paths.json('songs/${Paths.formatToSongPath(song.song)}/chart'), chart);
-							trace('chart saved!\nsaved path: ' + Paths.json('songs/${Paths.formatToSongPath(song.song)}/chart'));
-							var savedText:FlxText = new FlxText(0, 0, 0,
-								'Chart saved! Saved path:\n' + Paths.json('songs/${Paths.formatToSongPath(song.song)}/chart'), 12);
-							savedText.setFormat(Paths.font('vcr.ttf'), 18, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-							savedText.screenCenter();
-							add(savedText);
-							new FlxTimer().start(2.25, (tmr:FlxTimer) ->
-							{
-								FlxTween.tween(savedText, {alpha: 0}, 0.75, {
-									ease: FlxEase.quadOut,
-									onComplete: (twn:FlxTween) ->
-									{
-										remove(savedText);
-										savedText.destroy();
-									}
-								});
-							});
-						}
-						catch (e:Dynamic)
-						{
-							trace('Error while saving chart: ' + e);
-						}
-					}
-				},
-				{name: 'Save Chart As', func: saveSong}
-			]
-		];*/
+        addMenuHandler("miLoadSong", function(_) { openSubState(new LoadSongSubState()); });
+        addMenuHandler("miLoadJSON", function(_) { loadSongFromFile(); });
+        addMenuHandler("miSave", function(_) { saveSong(); });
+        addMenuHandler("miSaveAs", function(_) { saveSong(); }); // reuse saveSong for now
+        addMenuHandler("miExit", function(_) { FlxG.resetState(); });
+
+        addMenuHandler("miCopySection", function(_) { copySection(); });
+        addMenuHandler("miPasteSection", function(_) { pasteSection(); });
+        addMenuHandler("miClearSection", function(_) { clearSection(); });
+        addMenuHandler("miClearSong", function(_) { clearSong(); });
+
+        addMenuHandler("miPlaytest", function(_) { openPlayState(); });
+        addMenuHandler("miEditMetadata", function(_) { openMetadataDialog(); });
+
+        addMenuHandler("miControls", function(_) { openSubState(new HelpSubState()); });
+
+        if (btnSaveMetadata != null)
+            btnSaveMetadata.addEventListener(ComponentEvent.ACTION, function(_) { saveMetadata(); });
+        if (btnCancelMetadata != null)
+            btnCancelMetadata.addEventListener(ComponentEvent.ACTION, function(_) { closeMetadataDialog(); });
 
 		var mouseSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image('cursor/cursor'));
 		FlxG.mouse.load(mouseSpr.pixels);
@@ -220,65 +162,89 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 		charterVer.screenCenter(X);
 		charterVer.scrollFactor.set();
 		add(charterVer);
-
-		var dropdownBar:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, 32, FlxColor.GRAY);
-		add(dropdownBar);
-
-		var xPos:Int = 10;
-
-		/*for (menuName in menuStructure.keys())
-		{
-			var label:FlxText = new FlxText(xPos, 5, 0, menuName, 16);
-			label.setFormat(Paths.font('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-			label.textField.background = true;
-			label.textField.backgroundColor = FlxColor.GRAY;
-			FlxMouseEvent.add(label, (_) -> toggleDropdown(label.text), null, (_) ->
-			{
-				label.textField.backgroundColor = FlxColor.WHITE;
-				label.color = FlxColor.BLACK;
-			}, (_) ->
-				{
-					label.textField.backgroundColor = FlxColor.GRAY;
-					label.color = FlxColor.WHITE;
-				});
-			label.ID = topNavBar.length;
-			add(label);
-			topNavBar.push(label);
-
-			var items:Array<FlxText> = [];
-			var yOffset:Int = 32;
-
-			for (item in menuStructure.get(menuName))
-			{
-				var text:FlxText = new FlxText(xPos, yOffset, 150, item.name, 14);
-				text.setFormat(Paths.font('vcr.ttf'), 14, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				text.textField.background = true;
-				text.textField.backgroundColor = FlxColor.GRAY;
-				text.visible = false;
-				FlxMouseEvent.add(text, (_) ->
-				{
-					hideAllDropdowns();
-					item.func();
-				}, null, (_) ->
-					{
-						text.textField.backgroundColor = FlxColor.WHITE;
-						text.color = FlxColor.BLACK;
-					}, (_) ->
-					{
-						text.textField.backgroundColor = FlxColor.GRAY;
-						text.color = FlxColor.WHITE;
-					});
-				add(text);
-				items.push(text);
-				yOffset += 20;
-			}
-
-			dropDowns.set(menuName, items);
-			xPos += 70;
-		}*/
-
-		super.create();
 	}
+
+	function addMenuHandler(id:String, f:ComponentEvent->Void):Void
+    {
+        var comp:Component = this.findComponent(id);
+        if (comp != null)
+        {
+            comp.addEventListener(ComponentEvent.ACTION, f);
+        }
+    }
+
+	function openMetadataDialog():Void
+    {
+        if (metadataDialog == null) return;
+
+        if (inputSongName != null) inputSongName.text = song.song;
+        if (inputSongBPM != null) inputSongBPM.text = Std.string(song.bpm);
+        if (inputSongSig != null) inputSongSig.text = '${song.timeSignature[0]},${song.timeSignature[1]}';
+
+        metadataDialog.show();
+    }
+
+    function saveMetadata():Void
+    {
+        if (inputSongName != null) song.song = inputSongName.text;
+        if (inputSongBPM != null) song.bpm = Std.parseFloat(inputSongBPM.text);
+        if (inputSongSig != null)
+        {
+            var parts = inputSongSig.text.split(',');
+            if (parts.length >= 2)
+            {
+                song.timeSignature = [Std.parseInt(parts[0]), Std.parseInt(parts[1])];
+            }
+        }
+
+        Conductor.bpm = song.bpm;
+        ChartingState.instance.updateGrid();
+        closeMetadataDialog();
+    }
+
+    function closeMetadataDialog():Void
+    {
+        if (metadataDialog != null) metadataDialog.hide();
+    }
+
+    function copySection():Void
+    {
+        notesCopied = [];
+        sectionToCopy = curSection;
+        for (i in 0...song.notes[curSection].sectionNotes.length)
+            notesCopied.push(song.notes[curSection].sectionNotes[i]);
+    }
+
+    function pasteSection():Void
+    {
+        if (notesCopied == null || notesCopied.length < 1) return;
+        for (note in notesCopied)
+        {
+            var clonedNote = {
+                noteStrum: note.noteStrum + Conductor.stepCrochet * (4 * 4 * (curSection - sectionToCopy)),
+                noteData: note.noteData,
+                noteSus: note.noteSus
+            };
+            song.notes[curSection].sectionNotes.push(clonedNote);
+        }
+        updateGrid();
+    }
+
+    function clearSection():Void
+    {
+        song.notes[curSection].sectionNotes = [];
+        updateGrid();
+    }
+
+    function clearSong():Void
+    {
+        openSubState(new PromptSubState(Localization.get('youDecide'), () ->
+        {
+            for (daSection in 0...song.notes.length)
+                song.notes[daSection].sectionNotes = [];
+            updateGrid();
+        }));
+    }
 
 	override public function update(elapsed:Float):Void
 	{
@@ -388,26 +354,6 @@ class ChartingState extends haxe.ui.backend.flixel.UIState
 
 		super.update(elapsed);
 	}
-
-	/*function toggleDropdown(label:String):Void
-	{
-		for (key in dropDowns.keys())
-		{
-			final show = key == label && activeDropdown != label;
-			for (item in dropDowns.get(key))
-				item.visible = show;
-		}
-
-		activeDropdown = (activeDropdown == label) ? '' : label;
-	}
-
-	function hideAllDropdowns():Void
-	{
-		for (group in dropDowns)
-			for (item in group)
-				item.visible = false;
-		activeDropdown = '';
-	}*/
 
 	function openPlayState():Void
 	{

@@ -1,31 +1,30 @@
 <menubar id="menubar" width="100%">
-        <style>
-        .menu {
-            width: 120px;
-        }
-        </style>
-        <menu text="File">
-            <menu-item text="Load Song" />
-            <menu-item text="Load JSON" />
-            <menu-item text="Save" shortcutText="Ctrl+S" />
-            <menu-item text="Save As..." shortcutText="Ctrl+Shift+S" />
-            <menu-separator />
-            <menu-item text="Exit" shortcutText="Esc" />
-        </menu>
+    <style>
+        .menu { width: 120px; }
+    </style>
 
-        <menu text="Edit">
-            <menu-item text="Copy Section" shortcutText="Ctrl+C" />
-            <menu-item text="Paste Section" shortcutText="Ctrl+V" />
-            <menu-item text="Clear Section" />
-            <menu-item text="Clear Song" />
-        </menu>
+    <menu text="File" id="menuFile">
+        <menu-item id="miLoadSong" text="Load Song" />
+        <menu-item id="miLoadJSON" text="Load JSON" />
+        <menu-item id="miSave" text="Save" shortcutText="Ctrl+S" />
+        <menu-item id="miSaveAs" text="Save As..." shortcutText="Ctrl+Shift+S" />
+        <menu-separator />
+        <menu-item id="miExit" text="Exit" shortcutText="Esc" />
+    </menu>
 
-        <menu text="Chart">
-            <menu-item text="Playtest" shortcutText="Enter" />
-            <menu-item text="Edit Metadata" />
-        </menu>
+    <menu text="Edit" id="menuEdit">
+        <menu-item id="miCopySection" text="Copy Section" shortcutText="Ctrl+C" />
+        <menu-item id="miPasteSection" text="Paste Section" shortcutText="Ctrl+V" />
+        <menu-item id="miClearSection" text="Clear Section" />
+        <menu-item id="miClearSong" text="Clear Song" />
+    </menu>
 
-        <menu text="Help">
-            <menu-item text="Controls" />
-        </menu>
-    </menubar>
+    <menu text="Chart" id="menuChart">
+        <menu-item id="miPlaytest" text="Playtest" shortcutText="Enter" />
+        <menu-item id="miEditMetadata" text="Edit Metadata" />
+    </menu>
+
+    <menu text="Help" id="menuHelp">
+        <menu-item id="miControls" text="Controls" />
+    </menu>
+</menubar>

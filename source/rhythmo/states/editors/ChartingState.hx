@@ -90,14 +90,9 @@ miClearSection.onClick = function(e:MouseEvent) { clearSection(); };
 miClearSong.onClick = function(e:MouseEvent) { clearSong(); };
 
 miPlaytest.onClick = function(e:MouseEvent) { openPlayState(); };
-miEditMetadata.onClick = function(e:MouseEvent) { openMetadataDialog(); };
+// miEditMetadata.onClick = function(e:MouseEvent) { openMetadataDialog(); };
 
 miControls.onClick = function(e:MouseEvent) { openSubState(new HelpSubState()); };
-
-        if (btnSaveMetadata != null)
-            btnSaveMetadata.onClick = function(_) saveMetadata();
-        if (btnCancelMetadata != null)
-            btnCancelMetadata.onClick = function(_) closeMetadataDialog();
 
 		var mouseSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image('cursor/cursor'));
 		FlxG.mouse.load(mouseSpr.pixels);
@@ -142,40 +137,6 @@ miControls.onClick = function(e:MouseEvent) { openSubState(new HelpSubState()); 
 		charterVer.scrollFactor.set();
 		add(charterVer);
 	}
-
-	function openMetadataDialog():Void
-    {
-        if (metadataDialog == null) return;
-
-        if (inputSongName != null) inputSongName.text = song.song;
-        if (inputSongBPM != null) inputSongBPM.text = Std.string(song.bpm);
-        if (inputSongSig != null) inputSongSig.text = '${song.timeSignature[0]},${song.timeSignature[1]}';
-
-        metadataDialog.show();
-    }
-
-    function saveMetadata():Void
-    {
-        if (inputSongName != null) song.song = inputSongName.text;
-        if (inputSongBPM != null) song.bpm = Std.parseFloat(inputSongBPM.text);
-        if (inputSongSig != null)
-        {
-            var parts = inputSongSig.text.split(',');
-            if (parts.length >= 2)
-            {
-                song.timeSignature = [Std.parseInt(parts[0]), Std.parseInt(parts[1])];
-            }
-        }
-
-        Conductor.bpm = song.bpm;
-        ChartingState.instance.updateGrid();
-        closeMetadataDialog();
-    }
-
-    function closeMetadataDialog():Void
-    {
-        if (metadataDialog != null) metadataDialog.hide();
-    }
 
     function copySection():Void
     {

@@ -18,4 +18,7 @@
 ## Future To-Dos
 * [ ] New Song
 * [ ] Extra Keys
-* [ ] Huge Overhaul?
+* [ ] Rewrite a ton
+    * Use Polymod Hscriptable
+    * Use Firetongue
+    * Maybe more?

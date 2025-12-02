@@ -1,3 +1,10 @@
+# PLEASE READ!
+I haven't done too much for this game in a bit.
+But, I have decided that I want to rewrite/remake this game. <br>
+Mostly because the code is a bit messy and unoptimized. <br>
+This means that as of December 2, 2025, this repository will stop receiving updates. <br>
+Expect the update soon, and please redirect all future and current enhancements to the [new repository](https://github.com/JoaTH-Team/Rhythmo)!
+
 <p align="center">
   <img src="./assets/images/menu/title/logo.png" width="900">
 </p>
